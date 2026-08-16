@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Smart Timetable Generator | NEP 2020 Dynamic Scheduling Engine</title>
+  <meta name="description" content="AI-Powered Smart Timetable Generator with NEP 2020 Multidisciplinary support, zero-conflict constraint satisfaction, automated faculty proxy substitution, and multi-view timetable exports.">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-info">
+          <h1>
+            AI Smart Timetable Generator
+            <span class="nep-badge">NEP 2020 Compliant</span>
+          </h1>
+          <p>Autonomous Constraint-Satisfaction Engine • Multi-Disciplinary Framework • Dynamic Proxy Substitution</p>
+        </div>
+      </div>
+
+      <!-- Quick Preset Loaders -->
+      <div class="header-actions">
+        <button class="btn-demo-preset" onclick="loadPreset('nepEngineering')">
+          <span>🚀</span> Load B.Tech CSE / AI Dataset
+        </button>
+        <button class="btn-demo-preset" onclick="loadPreset('nepArtsScience')">
+          <span>📚</span> Load Arts & Science Dataset
+        </button>
+        <button class="btn-demo-preset" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4);" onclick="clearAllData()">
+          <span>🗑️</span> Reset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <main class="app-layout">
+
+    <!-- KPI Statistics Bar -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon indigo">🏫</div>
+        <div class="kpi-data">
+          <h3 id="kpiClassCount">0</h3>
+          <p>Classes / Sections</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon emerald">👨‍🏫</div>
+        <div class="kpi-data">
+          <h3 id="kpiTeacherCount">0</h3>
+          <p>Faculty Members</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon cyan">🚪</div>
+        <div class="kpi-data">
+          <h3 id="kpiRoomCount">0</h3>
+          <p>Rooms & Labs</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon purple">📚</div>
+        <div class="kpi-data">
+          <h3 id="kpiSubjectCount">0</h3>
+          <p>Active Courses</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon amber">🔄</div>
+        <div class="kpi-data">
+          <h3 id="kpiChangeCount">0</h3>
+          <p>Proxy Adjustments</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab Navigation -->
+    <nav class="nav-tabs-wrapper">
+      <ul class="nav-tabs">
+        <li><button class="nav-tab-btn active" data-tab="dashboardTab">📊 Overview & Workload</button></li>
+        <li><button class="nav-tab-btn" data-tab="timetableTab">📅 Timetable Explorer</button></li>
+        <li><button class="nav-tab-btn" data-tab="generatorTab">🤖 AI Generator</button></li>
+        <li><button class="nav-tab-btn" data-tab="entitiesTab">🏫 Data Management</button></li>
+        <li><button class="nav-tab-btn" data-tab="settingsTab">⏱️ Timings & Rules</button></li>
+        <li><button class="nav-tab-btn" data-tab="absenceTab">🚨 Absence & Proxy</button></li>
+        <li><button class="nav-tab-btn" data-tab="backupTab">💾 Export & Backup</button></li>
+      </ul>
+    </nav>
+
+    <!-- TAB 1: DASHBOARD & WORKLOAD -->
+    <div id="dashboardTab" class="tab-pane active">
+      <div id="analyticsContent"></div>
+    </div>
+
+    <!-- TAB 2: TIMETABLE EXPLORER -->
+    <div id="timetableTab" class="tab-pane">
+      <div class="view-switcher-bar">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-outline btn-sm" onclick="setTimetableViewMode('class')">🏫 Class View</button>
+          <button class="btn btn-outline btn-sm" onclick="setTimetableViewMode('faculty')">👨‍🏫 Faculty View</button>
+          <button class="btn btn-outline btn-sm" onclick="setTimetableViewMode('room')">🚪 Room Occupancy</button>
+          <button class="btn btn-outline btn-sm" onclick="setTimetableViewMode('master')">🌐 Master Matrix</button>
+        </div>
+
+        <div class="view-filters">
+          <label id="viewFilterLabel" class="form-label" style="margin:0;">Select:</label>
+          <select id="viewFilterSelect" class="form-control" style="width: auto; min-width: 220px;" onchange="handleFilterEntityChange()"></select>
+        </div>
+      </div>
+
+      <div id="timetableDisplayArea" class="timetable-container"></div>
+    </div>
+
+    <!-- TAB 3: AI GENERATOR -->
+    <div id="generatorTab" class="tab-pane">
+      <div class="generator-hero">
+        <div class="generator-hero-content">
+          <h2>⚡ AI Autonomous Scheduling Engine</h2>
+          <p>
+            The engine executes a constraint satisfaction heuristic solver with randomized restarts to achieve 
+            <strong>zero schedule conflicts</strong>, respecting NEP 2020 credit allocations, faculty workload balancing, 
+            and continuous 2-period lab blocks.
+          </p>
+
+          <div class="constraints-checklist">
+            <div class="constraint-item">✓ Zero Faculty Double-Booking</div>
+            <div class="constraint-item">✓ Zero Classroom / Lab Collision</div>
+            <div class="constraint-item">✓ 2-Period Continuous Lab Blocks</div>
+            <div class="constraint-item">✓ Lunch Break Protection</div>
+            <div class="constraint-item">✓ Daily Workload Balancing</div>
+            <div class="constraint-item">✓ NEP 2020 Multidisciplinary Tags</div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" onclick="generateAITimetable()">
+            ✨ Generate AI Timetable Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: DATA MANAGEMENT (CLASSES, TEACHERS, ROOMS, SUBJECTS) -->
+    <div id="entitiesTab" class="tab-pane">
+      
+      <!-- CLASSES SECTION -->
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">🏫 Classes & Sections</h3>
+            <p class="card-subtitle">Manage degree batches, semesters, and sections</p>
+          </div>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">Class / Section Name *</label>
+            <input id="className" class="form-control" placeholder="e.g. CSE-A (3rd Sem)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input id="classDepartment" class="form-control" placeholder="e.g. Computer Science">
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn btn-primary" onclick="addClass()">+ Add Class</button>
+          </div>
+        </div>
+        <div class="entity-table-wrapper">
+          <table class="entity-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Class / Section Name</th>
+                <th>Department</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="classTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TEACHERS SECTION -->
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">👨‍🏫 Faculty Members</h3>
+            <p class="card-subtitle">Manage faculty, department affiliations, and contact emails</p>
+          </div>
+        </div>
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label class="form-label">Faculty Name *</label>
+            <input id="teacherName" class="form-control" placeholder="e.g. Dr. Ravi Sharma">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input id="teacherEmail" type="email" class="form-control" placeholder="e.g. ravi@college.edu">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input id="teacherDept" class="form-control" placeholder="e.g. Computer Science">
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn btn-primary" onclick="addTeacher()">+ Add Faculty</button>
+          </div>
+        </div>
+        <div class="entity-table-wrapper">
+          <table class="entity-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Faculty Name</th>
+                <th>Department</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="teacherTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ROOMS SECTION -->
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">🚪 Classrooms & Laboratories</h3>
+            <p class="card-subtitle">Manage lecture halls, smart classrooms, and specialized labs</p>
+          </div>
+        </div>
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label class="form-label">Room / Lab Name *</label>
+            <input id="roomName" class="form-control" placeholder="e.g. Computing Lab 1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Room Type *</label>
+            <select id="roomType" class="form-control">
+              <option value="classroom">Classroom / Lecture Hall</option>
+              <option value="lab">Specialized Laboratory</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Student Capacity</label>
+            <input id="roomCapacity" type="number" class="form-control" value="60">
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn btn-primary" onclick="addRoom()">+ Add Room</button>
+          </div>
+        </div>
+        <div class="entity-table-wrapper">
+          <table class="entity-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Room Name</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="roomTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBJECTS SECTION -->
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">📚 Subjects & NEP 2020 Courses</h3>
+            <p class="card-subtitle">Assign subjects to classes and faculty with NEP multidisciplinary tags</p>
+          </div>
+        </div>
+        <div class="form-grid-3" style="margin-bottom: 12px;">
+          <div class="form-group">
+            <label class="form-label">Class / Section *</label>
+            <select id="subjectClass" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject Title *</label>
+            <input id="subjectName" class="form-control" placeholder="e.g. Data Structures">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subject Code</label>
+            <input id="subjectCode" class="form-control" placeholder="e.g. CS301">
+          </div>
+        </div>
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label class="form-label">Assigned Faculty *</label>
+            <select id="subjectTeacher" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">NEP Category</label>
+            <select id="subjectCategory" class="form-control">
+              <option value="Major">Major Core Discipline</option>
+              <option value="Minor">Minor Stream</option>
+              <option value="SEC">Skill Enhancement Course (SEC)</option>
+              <option value="VAC">Value Added Course (VAC)</option>
+              <option value="AEC">Ability Enhancement (AEC)</option>
+              <option value="Major Lab">Major Laboratory</option>
+              <option value="SEC Lab">Skill Enhancement Lab</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Periods / Week *</label>
+            <input id="subjectPeriods" type="number" min="1" max="15" value="4" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Session Type</label>
+            <select id="subjectType" class="form-control">
+              <option value="theory">Theory Lecture</option>
+              <option value="lab">Practical Laboratory</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
+          <button class="btn btn-primary" onclick="addSubject()">+ Add Subject Course</button>
+        </div>
+        <div class="entity-table-wrapper">
+          <table class="entity-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Subject Course</th>
+                <th>Target Class</th>
+                <th>Faculty</th>
+                <th>NEP Category</th>
+                <th>Periods / Wk</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="subjectTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 5: TIMINGS & NEP RULES -->
+    <div id="settingsTab" class="tab-pane">
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">⏱️ Academic Timings & Schedule Constraints</h3>
+            <p class="card-subtitle">Configure working days, period timings, and break slots</p>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">Working Days per Week</label>
+            <select id="workingDays" class="form-control">
+              <option value="5">5 Days (Monday - Friday)</option>
+              <option value="6">6 Days (Monday - Saturday)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Periods per Day</label>
+            <select id="periodsPerDay" class="form-control">
+              <option value="5">5 Periods</option>
+              <option value="6">6 Periods</option>
+              <option value="7" selected>7 Periods</option>
+              <option value="8">8 Periods</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Institution Start Time</label>
+            <input id="startTime" type="time" class="form-control" value="09:00">
+          </div>
+        </div>
+
+        <div class="form-grid-3" style="margin-top: 16px;">
+          <div class="form-group">
+            <label class="form-label">Period Duration (Minutes)</label>
+            <input id="periodDuration" type="number" min="30" max="90" value="50" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lunch Break After Period #</label>
+            <select id="lunchAfterPeriod" class="form-control">
+              <option value="3">After Period 3</option>
+              <option value="4" selected>After Period 4</option>
+              <option value="5">After Period 5</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Lunch Duration (Minutes)</label>
+            <input id="lunchDuration" type="number" min="20" max="60" value="45" class="form-control">
+          </div>
+        </div>
+
+        <div class="form-grid-3" style="margin-top: 16px;">
+          <div class="form-group">
+            <label class="form-label">Lab Session Block Size</label>
+            <select id="labContinuousPeriods" class="form-control">
+              <option value="2" selected>2 Continuous Periods (Recommended)</option>
+              <option value="3">3 Continuous Periods</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: ABSENCE & PROXY SUBSTITUTION -->
+    <div id="absenceTab" class="tab-pane">
+      <div class="absence-hero">
+        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">🚨 Real-Time Faculty Absence & Proxy Rescheduling</h2>
+        <p style="font-size: 13px; opacity: 0.9;">
+          When a faculty member is marked absent, the AI analyzes teacher availability, domain qualification, 
+          and daily workload balance to find optimal proxy teachers without creating schedule conflicts.
+        </p>
+      </div>
+
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">Mark Faculty Absent</h3>
+            <p class="card-subtitle">Select the on-leave faculty member and date to trigger auto-proxying</p>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="form-label">Absent Faculty Member *</label>
+            <select id="absentTeacherSelect" class="form-control"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Absence Date *</label>
+            <input id="absenceDate" type="date" class="form-control">
+          </div>
+
+          <div class="form-group" style="justify-content: flex-end;">
+            <button class="btn btn-danger" onclick="handleTeacherAbsence()">
+              🚨 Find Smart Proxy & Reschedule
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Area where proxy substitution breakdown and emails render -->
+      <div id="proxyResultsArea" style="display:none;"></div>
+    </div>
+
+    <!-- TAB 7: BACKUP & EXPORT -->
+    <div id="backupTab" class="tab-pane">
+      <div class="card-section">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">💾 Backup & Data Export</h3>
+            <p class="card-subtitle">Export timetables to CSV or save full system configuration as JSON</p>
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="card-section" style="background: var(--bg-subtle);">
+            <h4>📄 Export Timetable CSV</h4>
+            <p style="font-size:12px; color:var(--text-muted); margin: 8px 0 14px;">Download comprehensive spreadsheet of active timetable.</p>
+            <button class="btn btn-primary btn-sm" onclick="exportCSV()">Download CSV</button>
+          </div>
+
+          <div class="card-section" style="background: var(--bg-subtle);">
+            <h4>📦 Database JSON Backup</h4>
+            <p style="font-size:12px; color:var(--text-muted); margin: 8px 0 14px;">Save entire configuration (classes, faculty, rooms, subjects).</p>
+            <button class="btn btn-primary btn-sm" onclick="exportJSONBackup()">Export JSON</button>
+          </div>
+
+          <div class="card-section" style="background: var(--bg-subtle);">
+            <h4>📥 Restore Database</h4>
+            <p style="font-size:12px; color:var(--text-muted); margin: 8px 0 14px;">Import a previously saved JSON backup file.</p>
+            <input type="file" accept=".json" onchange="importJSONBackup(event)" style="font-size: 12px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: MANUAL SLOT SWAP & EDIT -->
+  <div id="slotEditModal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit / Swap Timetable Slot</h3>
+        <button class="modal-close" onclick="closeSlotModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: var(--bg-subtle); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 16px;">
+          <div style="font-weight:700; font-size:14px;" id="modalSlotSubject">Subject Name</div>
+          <div style="font-size:12px; color:var(--text-muted);" id="modalSlotLocation">Day 1, Period 1</div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Assign Faculty Member</label>
+          <select id="modalTeacherSelect" class="form-control"></select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Assign Classroom / Lab</label>
+          <select id="modalRoomSelect" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Swap Slot with Another Period (Same Class)</label>
+          <select id="modalSwapTargetSelect" class="form-control"></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeSlotModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSlotModalChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/demo-data.js"></script>
+  <script src="js/scheduler.js"></script>
+  <script src="js/substitution.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
